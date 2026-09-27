@@ -83,7 +83,22 @@ def load_musicxml_snapshot(path: str | Path) -> SemanticSnapshot:
     for part_index, part in enumerate(score.parts):
         part_id = _part_id(part, diagnostics)
         measures = list(part.measures)
-        measure_count += len(measures)
+        measure_count = max(measure_count, len(measures))
+
+        for unpitched_note in part.iter_all(pt_score.UnpitchedNote):
+            source_id_raw = getattr(unpitched_note, "id", None)
+            source_id = str(source_id_raw) if source_id_raw is not None else None
+            diagnostics.append(
+                Diagnostic(
+                    code=DiagnosticCode.UNSUPPORTED_STRUCTURE,
+                    severity=DiagnosticSeverity.ERROR,
+                    message=(
+                        "Unpitched notes are not supported by "
+                        "st-semantic-snapshot-v1."
+                    ),
+                    source_id=source_id,
+                )
+            )
 
         for source_ordinal, note in enumerate(
             part.iter_all(pt_score.Note, include_subclasses=True)
