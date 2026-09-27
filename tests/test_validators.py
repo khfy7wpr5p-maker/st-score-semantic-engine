@@ -8,9 +8,9 @@ from st_score_semantic_engine.model import (
     ValidationStatus,
 )
 from st_score_semantic_engine.validators.measure import validate_measure_membership
+from st_score_semantic_engine.validators.suite import validate_snapshot
 from st_score_semantic_engine.validators.ties import validate_ties
 from st_score_semantic_engine.validators.timing import validate_timing
-from st_score_semantic_engine.validators.suite import validate_snapshot
 from st_score_semantic_engine.validators.voice_staff import validate_voice_staff
 
 
