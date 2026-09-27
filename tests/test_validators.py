@@ -1,5 +1,10 @@
 from st_score_semantic_engine import SNAPSHOT_SCHEMA_VERSION
-from st_score_semantic_engine.model import (\n    Diagnostic,\n    DiagnosticCode,\n    SemanticNote,\n    SemanticSnapshot,\n)
+from st_score_semantic_engine.model import (
+    Diagnostic,
+    DiagnosticCode,
+    SemanticNote,
+    SemanticSnapshot,
+)
 from st_score_semantic_engine.validators.measure import validate_measure_membership
 from st_score_semantic_engine.validators.ties import validate_ties
 from st_score_semantic_engine.validators.timing import validate_timing
