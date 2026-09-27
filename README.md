@@ -33,13 +33,13 @@ The first implementation sequence is tracked in
 JSON-serializable `SemanticSnapshot`. The current snapshot surface covers:
 
 - source note ID and part ID;
-- zero-based measure membership;
+- zero-based measure membership; `measure_count` is the score-wide measure span (maximum ordered measure count across parts);
 - MIDI pitch;
 - onset and duration in MusicXML/Partitura divisions;
 - voice and staff;
 - bounded tie relations;
 - explicit time signature, key signature, and clef contexts;
-- adapter diagnostics when source semantics are missing or unsupported.
+- adapter diagnostics when source semantics are missing or unsupported; unpitched notes currently fail closed as `UNSUPPORTED_STRUCTURE`.
 
 `validate_snapshot(snapshot)` runs the baseline read-only validators and returns a deterministic
 `ValidationReport` with one of three statuses:
