@@ -25,7 +25,7 @@ jobs:
       - name: Test
         run: python -m pytest -q
       - name: Ruff
-        run: ruff check . --fix --diff
+        run: ruff check .
       - name: Mypy
         run: mypy src
       - name: Build
