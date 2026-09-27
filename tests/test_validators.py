@@ -1,12 +1,16 @@
 from st_score_semantic_engine import SNAPSHOT_SCHEMA_VERSION
 from st_score_semantic_engine.model import (
+    Diagnostic,
     DiagnosticCode,
+    DiagnosticSeverity,
     SemanticNote,
     SemanticSnapshot,
+    ValidationStatus,
 )
 from st_score_semantic_engine.validators.measure import validate_measure_membership
 from st_score_semantic_engine.validators.ties import validate_ties
 from st_score_semantic_engine.validators.timing import validate_timing
+from st_score_semantic_engine.validators.suite import validate_snapshot
 from st_score_semantic_engine.validators.voice_staff import validate_voice_staff
 
 
@@ -51,8 +55,8 @@ def _snapshot(*notes: SemanticNote, measure_count: int = 2) -> SemanticSnapshot:
     )
 
 
-def _codes(diagnostics: tuple[object, ...]) -> list[DiagnosticCode]:
-    return [diagnostic.code for diagnostic in diagnostics]  # type: ignore[attr-defined]
+def _codes(diagnostics: tuple[Diagnostic, ...]) -> list[DiagnosticCode]:
+    return [diagnostic.code for diagnostic in diagnostics]
 
 
 def test_measure_membership_accepts_valid_indices():
@@ -166,3 +170,56 @@ def test_ties_fail_closed_for_duplicate_source_ids():
     )
 
     assert _codes(diagnostics) == [DiagnosticCode.UNSUPPORTED_STRUCTURE]
+
+
+def test_validation_report_passes_clean_snapshot():
+    report = validate_snapshot(_snapshot(_note()))
+
+    assert report.schema_version == "st-semantic-validation-report-v1"
+    assert report.status is ValidationStatus.PASS
+    assert report.diagnostics == ()
+
+
+def test_validation_report_marks_missing_voice_as_diagnostic():
+    report = validate_snapshot(_snapshot(_note(source_id="missing-voice", voice=None)))
+
+    assert report.status is ValidationStatus.DIAGNOSTIC
+    assert _codes(report.diagnostics) == [DiagnosticCode.MISSING_VOICE]
+
+
+def test_validation_report_marks_duplicate_tie_identity_as_unsupported():
+    report = validate_snapshot(
+        _snapshot(
+            _note(source_id="dup", tie_next="b"),
+            _note(source_id="dup", onset_div=2),
+            _note(source_id="b", onset_div=4, tie_prev="dup"),
+        )
+    )
+
+    assert report.status is ValidationStatus.UNSUPPORTED
+    assert _codes(report.diagnostics) == [DiagnosticCode.UNSUPPORTED_STRUCTURE]
+
+
+def test_validation_report_includes_adapter_diagnostics():
+    snapshot = SemanticSnapshot(
+        schema_version=SNAPSHOT_SCHEMA_VERSION,
+        source_kind="test",
+        part_count=1,
+        measure_count=1,
+        notes=(_note(),),
+        time_signatures=(),
+        key_signatures=(),
+        clefs=(),
+        diagnostics=(
+            Diagnostic(
+                code=DiagnosticCode.MISSING_SOURCE_ID,
+                severity=DiagnosticSeverity.WARNING,
+                message="Adapter warning.",
+            ),
+        ),
+    )
+
+    report = validate_snapshot(snapshot)
+
+    assert report.status is ValidationStatus.DIAGNOSTIC
+    assert _codes(report.diagnostics) == [DiagnosticCode.MISSING_SOURCE_ID]

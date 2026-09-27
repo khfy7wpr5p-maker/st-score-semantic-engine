@@ -3,6 +3,8 @@ from pathlib import Path
 
 from st_score_semantic_engine import serialization
 from st_score_semantic_engine.adapters import partitura_musicxml
+from st_score_semantic_engine.model import ValidationStatus
+from st_score_semantic_engine.validators.suite import validate_snapshot
 
 FIXTURE_DIR = Path(__file__).parent / "fixtures"
 MUSICXML_FIXTURE = FIXTURE_DIR / "semantic_baseline.musicxml"
@@ -28,3 +30,11 @@ def test_musicxml_snapshot_is_deterministic():
     )
 
     assert first == second
+
+
+def test_musicxml_fixture_passes_baseline_validation():
+    snapshot = partitura_musicxml.load_musicxml_snapshot(MUSICXML_FIXTURE)
+    report = validate_snapshot(snapshot)
+
+    assert report.status is ValidationStatus.PASS
+    assert report.diagnostics == ()
