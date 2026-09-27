@@ -1,6 +1,5 @@
 from st_score_semantic_engine import SNAPSHOT_SCHEMA_VERSION
 from st_score_semantic_engine.model import (
-    Diagnostic,
     DiagnosticCode,
     SemanticNote,
     SemanticSnapshot,
