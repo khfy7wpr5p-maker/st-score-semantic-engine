@@ -4,7 +4,6 @@ from pathlib import Path
 from st_score_semantic_engine import serialization
 from st_score_semantic_engine.adapters import partitura_musicxml
 
-
 FIXTURE_DIR = Path(__file__).parent / "fixtures"
 MUSICXML_FIXTURE = FIXTURE_DIR / "semantic_baseline.musicxml"
 EXPECTED_FIXTURE = FIXTURE_DIR / "semantic_baseline.expected.json"
