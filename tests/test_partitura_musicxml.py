@@ -1,7 +1,9 @@
 import json
 from pathlib import Path
 
-from st_score_semantic_engine.adapters.partitura_musicxml import load_musicxml_snapshot
+from st_score_semantic_engine.adapters.partitura_musicxml import (
+    load_musicxml_snapshot,
+)
 from st_score_semantic_engine.serialization import snapshot_to_dict, snapshot_to_json
 
 
