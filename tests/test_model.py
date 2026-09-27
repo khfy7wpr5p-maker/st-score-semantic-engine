@@ -33,7 +33,7 @@ def test_semantic_note_is_immutable():
     note = _note()
 
     with pytest.raises(FrozenInstanceError):
-        setattr(note, "pitch_midi", 61)
+        note.pitch_midi = 61  # type: ignore[misc]
 
 
 def test_semantic_snapshot_uses_tuple_notes():
