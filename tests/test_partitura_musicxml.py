@@ -9,6 +9,8 @@ from st_score_semantic_engine.validators.suite import validate_snapshot
 FIXTURE_DIR = Path(__file__).parent / "fixtures"
 MUSICXML_FIXTURE = FIXTURE_DIR / "semantic_baseline.musicxml"
 EXPECTED_FIXTURE = FIXTURE_DIR / "semantic_baseline.expected.json"
+GUITAR_FIXTURE = FIXTURE_DIR / "semantic_guitar_compatible.musicxml"
+GUITAR_EXPECTED_FIXTURE = FIXTURE_DIR / "semantic_guitar_compatible.expected.json"
 
 
 def _expected() -> dict[str, object]:
@@ -102,3 +104,13 @@ def test_unpitched_note_is_reported_as_unsupported(tmp_path: Path):
         (diagnostic.code, diagnostic.source_id)
         for diagnostic in snapshot.diagnostics
     ] == [(DiagnosticCode.UNSUPPORTED_STRUCTURE, "u1")]
+
+
+def test_guitar_compatible_fixture_matches_semantic_snapshot():
+    expected = json.loads(GUITAR_EXPECTED_FIXTURE.read_text(encoding="utf-8"))
+    snapshot = partitura_musicxml.load_musicxml_snapshot(GUITAR_FIXTURE)
+
+    assert serialization.snapshot_to_dict(snapshot) == expected
+    report = validate_snapshot(snapshot)
+    assert report.status is ValidationStatus.PASS
+    assert report.diagnostics == ()
